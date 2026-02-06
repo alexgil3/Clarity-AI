@@ -23,3 +23,13 @@ class SocialNetwork:
         if username not in self._following:
             self._following[username] = set()
         self._following[username].add(target)
+
+    def wall(self, username):
+        users = {username}
+        users.update(self._following.get(username, set()))
+
+        all_posts = []
+        for user in users:
+            all_posts.extend(self._posts.get(user, []))
+
+        return sorted(all_posts, key=lambda p: p.timestamp, reverse=True)

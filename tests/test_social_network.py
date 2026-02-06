@@ -73,3 +73,54 @@ class TestFollowing:
         network.follow("Charlie", "Alice")
         network.follow("Charlie", "Bob")
         # should not raise
+
+
+class TestWall:
+    def test_wall_shows_own_posts(self):
+        clock = FakeClock()
+        network = SocialNetwork(clock)
+
+        network.post("Alice", "I love the weather today")
+
+        wall = network.wall("Alice")
+        assert len(wall) == 1
+        assert wall[0].message == "I love the weather today"
+
+    def test_wall_includes_followed_user_posts(self):
+        clock = FakeClock()
+        network = SocialNetwork(clock)
+
+        clock.set(datetime(2025, 1, 15, 9, 55, 0))
+        network.post("Alice", "I love the weather today")
+        clock.set(datetime(2025, 1, 15, 10, 0, 0))
+        network.post("Charlie", "I'm in New York today!")
+
+        network.follow("Charlie", "Alice")
+
+        wall = network.wall("Charlie")
+        assert len(wall) == 2
+        assert wall[0].message == "I'm in New York today!"
+        assert wall[1].message == "I love the weather today"
+
+    def test_wall_aggregates_all_followed_users(self):
+        clock = FakeClock()
+        network = SocialNetwork(clock)
+
+        clock.set(datetime(2025, 1, 15, 9, 55, 0))
+        network.post("Alice", "I love the weather today")
+        clock.set(datetime(2025, 1, 15, 9, 58, 0))
+        network.post("Bob", "Damn! We lost!")
+        clock.set(datetime(2025, 1, 15, 9, 59, 0))
+        network.post("Bob", "Good game though.")
+        clock.set(datetime(2025, 1, 15, 9, 59, 45))
+        network.post("Charlie", "I'm in New York today!")
+
+        network.follow("Charlie", "Alice")
+        network.follow("Charlie", "Bob")
+
+        wall = network.wall("Charlie")
+        assert len(wall) == 4
+        assert wall[0].username == "Charlie"
+        assert wall[1].username == "Bob"
+        assert wall[2].username == "Bob"
+        assert wall[3].username == "Alice"
