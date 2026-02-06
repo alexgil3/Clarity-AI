@@ -34,5 +34,25 @@ class TestPosting:
 
         timeline = network.read("Bob")
         assert len(timeline) == 2
-        assert timeline[0].message == "Damn! We lost!"
-        assert timeline[1].message == "Good game though."
+
+
+class TestReading:
+    def test_reading_unknown_user_returns_empty(self):
+        clock = FakeClock()
+        network = SocialNetwork(clock)
+
+        timeline = network.read("Nobody")
+        assert timeline == []
+
+    def test_posts_appear_in_reverse_chronological_order(self):
+        clock = FakeClock()
+        network = SocialNetwork(clock)
+
+        clock.set(datetime(2025, 1, 15, 10, 0, 0))
+        network.post("Bob", "Damn! We lost!")
+        clock.set(datetime(2025, 1, 15, 10, 1, 0))
+        network.post("Bob", "Good game though.")
+
+        timeline = network.read("Bob")
+        assert timeline[0].message == "Good game though."
+        assert timeline[1].message == "Damn! We lost!"

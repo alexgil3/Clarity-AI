@@ -15,4 +15,5 @@ class SocialNetwork:
         )
 
     def read(self, username):
-        return list(self._posts.get(username, []))
+        posts = self._posts.get(username, [])
+        return sorted(posts, key=lambda p: p.timestamp, reverse=True)
