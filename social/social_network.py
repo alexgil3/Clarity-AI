@@ -6,6 +6,7 @@ class SocialNetwork:
     def __init__(self, clock=None):
         self.clock = clock or Clock()
         self._posts = {}
+        self._following = {}
 
     def post(self, username, message):
         if username not in self._posts:
@@ -17,3 +18,8 @@ class SocialNetwork:
     def read(self, username):
         posts = self._posts.get(username, [])
         return sorted(posts, key=lambda p: p.timestamp, reverse=True)
+
+    def follow(self, username, target):
+        if username not in self._following:
+            self._following[username] = set()
+        self._following[username].add(target)

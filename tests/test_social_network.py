@@ -56,3 +56,20 @@ class TestReading:
         timeline = network.read("Bob")
         assert timeline[0].message == "Good game though."
         assert timeline[1].message == "Damn! We lost!"
+
+
+class TestFollowing:
+    def test_user_can_follow_another(self):
+        clock = FakeClock()
+        network = SocialNetwork(clock)
+
+        network.follow("Charlie", "Alice")
+        # should not raise
+
+    def test_user_can_follow_multiple_users(self):
+        clock = FakeClock()
+        network = SocialNetwork(clock)
+
+        network.follow("Charlie", "Alice")
+        network.follow("Charlie", "Bob")
+        # should not raise
